@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" doc:name="HTTP Listener Configuration"/>
+    <flow name="firstdayappFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/Test" allowedMethods="Get" doc:name="HTTP"/>
+        <set-payload value="Hello" doc:name="Set Payload"/>
+        <append-string-transformer message="To All" doc:name="Append String"/>
+        <flow-ref name="InboundFlow" doc:name="InboundFlow"/>
+        <flow-ref name="PropertyFlow" doc:name="PropertyFlow"/>
+    </flow>
+    <flow name="PropertyFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/outbound" doc:name="HTTP"/>
+        <set-variable variableName="Name" value="#[message.inboundProperties.'http.query.params'.name]" doc:name="Variable"/>
+        <set-property propertyName="#[message.inboundProperties.'http.query.params'.type]" value="" doc:name="type"/>
+        <logger message="#[message.inboundProperties.'http.query.params'.name]" level="INFO" doc:name="Logger"/>
+        <response>
+            <set-payload value="#[message.inboundProperties.'http.query.params'.name +&quot; &quot; +message.inboundProperties.'http.query.params'.type]" doc:name="Set Payload"/>
+        </response>
+    </flow>
+    <flow name="InboundFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/inbound" doc:name="HTTP"/>
+        <set-payload value="#[message.inboundProperties.'http.query.params'.name +&quot; &quot;+ message.inboundProperties.'http.query.params'.type]" doc:name="Name"/>
+        <logger level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>

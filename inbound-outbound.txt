@@ -1,0 +1,4 @@
+http://localhost:8081/Test
+http://localhost:8081/Test?name=Max&&type=Mule
+http://localhost:8081/inbound?name=Max&&type=Mule
+http://localhost:8081/outbound?name=Max&&type=Mule
